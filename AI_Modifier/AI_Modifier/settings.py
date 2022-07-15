@@ -87,9 +87,9 @@ WSGI_APPLICATION = 'AI_Modifier.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ai_modifier_db',
-        'USER': 'ai_modifier_user',
-        'PASSWORD': 'ai_modifier_pass',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASS'),
         'HOST': 'localhost',
         'PORT': '',
     }

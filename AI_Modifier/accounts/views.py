@@ -24,7 +24,6 @@ from modifier_admin.models import Profile
 
 def index(request):   
     
-    print('In Index')
     context = {}
     
     if request.user.is_authenticated:
@@ -144,15 +143,22 @@ def change_request(request):
                 Html_List = []
                 Response_Table = []
                 Response_Table_Length = len(Response_Table)
+                Repo_Path = f"{code_link[:code_link.find('//')+2]}{username}:{token}@{code_link[code_link.find('//')+2:]}"
+                print(f'Repo: {Repo_Path}')
+                Branch_Name = branch
+                Repo_Name = "All_Repo/" + Repo_Path[Repo_Path.rfind('/')+1:].split('.')[0]
+                
+                Html_List = []
+                for root, dirnames, filenames in os.walk(Repo_Name):
+                    for filename in filenames:
+                        if filename.endswith('.html'):
+                            Html_List.append(os.path.join(root, filename))
                 
                 # if 'Repo_Path' in request.POST and 'Branch_Name' in request.POST and 'Page_Name' not in request.POST and 'save' not in request.POST and 'push' not in request.POST:
                 if 'make_changes' in request.POST:
                     # Repo_Path = request.POST['Repo_Path']
                     # Branch_Name = request.POST['Branch_Name']
                     # Repo_Name = "All_Repo/" + Repo_Path[Repo_Path.rfind('/')+1:].split('.')[0]
-                    Repo_Path = f"{code_link[:code_link.find('//')+2]}{username}:{token}@{code_link[code_link.find('//')+2:]}"
-                    Branch_Name = branch
-                    Repo_Name = "All_Repo/" + Repo_Path[Repo_Path.rfind('/')+1:].split('.')[0]
                     
                     # Auto pull remote repository and change branch
                     if not(os.path.exists("All_Repo")):
@@ -168,11 +174,7 @@ def change_request(request):
                     # repo.git.pull()
                     
                     # Pull all the HTML files available in the repository
-                    Html_List = []
-                    for root, dirnames, filenames in os.walk(Repo_Name):
-                        for filename in filenames:
-                            if filename.endswith('.html'):
-                                Html_List.append(os.path.join(root, filename))
+                    
                     
                     # TemplateResponse(request, "accounts/change_request.html", {'Html_List':Html_List, 'Table':Response_Table, 'Table_Length':Response_Table_Length, 'msg':msg, 'save_btn':save_btn})
                 
@@ -380,7 +382,13 @@ def change_request(request):
                     #     msg = "Changes have been pushed successfully"
                     # except:
                     #     msg = "Error! Please try again later"
-                    msg = "Changes have been pushed successfully"
+                    try:
+                        change_request = ChangeRequest(client_request=client_request, repo=Repo_Name)
+                        change_request.save()
+                        msg = "Changes have been pushed successfully"
+                    except:
+                        msg = "Failed to push changes!"
+                        
                     # TemplateResponse(request, "accounts/change_request.html", {'Html_List':Html_List, 'Table':Response_Table, 'Table_Length':Response_Table_Length, 'msg':msg, 'save_btn':save_btn})
                     
                 else:

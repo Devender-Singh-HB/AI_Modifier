@@ -35,22 +35,22 @@ class ClientRequestAdmin(UserAdmin):
 @admin.action(description='Push selected repositories')
 def push_repository(modeladmin, request, queryset):
     for query in queryset:
-        try:
-            repo = git.Repo(query.repo)
-            repo.git.add(update=True)
-            commit_message = f"AI_MODIFIER_{uuid.uuid4().hex}"
-            repo.index.commit(commit_message)
-            origin = repo.remote(name='origin')
-            origin.push()
-            
-            query.success=True
-            query.error=f'Successfully Pushed comment: {commit_message}'
-            # print(query.repo)
-            
-            
-        except Exception as e:
-            query.update(success=False, error=f'Error: {e}')
-            # pass
+        if not query.success:
+            try:
+                repo = git.Repo(query.repo)
+                repo.git.add(update=True)
+                commit_message = f"AI_MODIFIER_{uuid.uuid4().hex}"
+                repo.index.commit(commit_message)
+                origin = repo.remote(name='origin')
+                origin.push()
+                
+                query.success=True
+                query.error=f'Successfully Pushed comment: {commit_message}'
+                # print(query.repo)
+                
+                
+            except Exception as e:
+                query.update(success=False, error=f'Error: {e}')
             
         query.save()
             
