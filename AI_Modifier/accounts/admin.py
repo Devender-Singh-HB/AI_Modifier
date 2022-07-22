@@ -38,7 +38,7 @@ def push_repository(modeladmin, request, queryset):
         if not query.success:
             try:
                 repo = git.Repo(query.repo)
-                repo.git.add(update=True)
+                repo.git.add(all=True)
                 commit_message = f"AI_MODIFIER_{uuid.uuid4().hex}"
                 repo.index.commit(commit_message)
                 origin = repo.remote(name='origin')
@@ -62,7 +62,7 @@ class ChangeRequestAdmin(UserAdmin):
     search_fields = ('repo', 'client_request', 'success', 'error',)
     ordering = ('repo',)
     list_display = ('repo', 'client_request', 'success', 'error',)
-    list_filter = ('repo', 'client_request', 'success', 'error',)
+    list_filter = ('client_request', 'success',)
     filter_horizontal =  tuple()
     
     fieldsets = (

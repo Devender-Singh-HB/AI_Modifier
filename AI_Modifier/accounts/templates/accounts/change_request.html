@@ -3,117 +3,201 @@
 {% block content %}
 
   {% if user.is_authenticated %}
+  {% load static %}
     <section class="header">
-<div class="header_btn">
+    <div class="header_btn">
       <strong><p>User: {{user.name}}</p></strong>
       <div class="btnn">
-      <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
-      <button type="submit" class="logout-btn"><a href="{% url 'index' %}">Cancel</a></button>
+        <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
+        <button type="submit" class="logout-btn"><a href="{% url 'index' %}">Cancel</a></button>
+      </div>
     </div>
-  </div>
-      <div>
-        <form class="text-manage" action="" method="post">
-          {% csrf_token %}
+    <div>
+      <form class="text-manage" action="" method="post">
+        {% csrf_token %}
 
-          {% if client_req_urls %}
-          <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
+        {% if client_req_urls %}
+        <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
+        {% endif %}
+        {% if Path_To_Search %}
+        <input type="hidden" name="Path_To_Search" id="Path_To_Search" value="{{Path_To_Search}}" required>
+        {% endif %}
+
+        <div class="msg">{{ msg }}</div>
+        <label>Repo path:</label>
+        <div name="Repo_Path" class="input-field1">
+          {% if repo %}
+          <span class="dropdown" value={{repo}}>{{repo}}</span>
+          {% else %}
+          <span class="dropdown" value="no_repo">No repo found</span>
           {% endif %}
-
-          <div class="msg">{{ msg }}</div>
-          <label>Repo path:</label>
-          <div name="Repo_Path" class="input-field1">
-            {% if repo %}
-            <span class="dropdown" value={{repo}}>{{repo}}</span>
-            {% else %}
-            <span class="dropdown" value="no_repo">No repo found</span>
-            {% endif %}
-          </div>
-          <br></br>
-          <label>Branch name:</label>
-          <div name="Branch_Name" class="input-field1">
-            <!--option selected disabled hidden>none</option-->
-            {% if branch %}
-            <span class="dropdown" value={{branch}}>{{branch}}</span>
-            {% else %}
-            <span class="dropdown" value="no_branch">No branch found</span>
-            {% endif %}
-          </div>
-          <br></br>
-          <label>Page name:</label>
-          <select name="Page_Name" class="input-field1">
-            <option class="dropdown" selected disabled hidden>Select an option</option>
-            {% for x in Html_List %}
-            <option class="dropdown" value="{{x}}">{{x}}</option>
-            {% endfor %}
-          </select>
-          <!--input name="Text_To_Replace" type="text" class="input-field" placeholder="Enter text to find and replace"-->
-          <div class="button-wapper">
-            <button type="submit"class="hero-btn">Find</button>
+        </div>
+        <br></br>
+        <label>Branch name:</label>
+        <div name="Branch_Name" class="input-field1">
+          <!--option selected disabled hidden>none</option-->
+          {% if branch %}
+          <span class="dropdown" value={{branch}}>{{branch}}</span>
+          {% else %}
+          <span class="dropdown" value="no_branch">No branch found</span>
+          {% endif %}
+        </div>
+        <br></br>
+        <label>Page name:</label>
+        <select name="Page_Name" class="input-field1">
+          <option class="dropdown" selected disabled hidden>Select an option</option>
+          {% for x in Html_List %}
+          <option class="dropdown" value="{{x.1}}">{{x.0}}</option>
+          {% endfor %}
+        </select>
+        <!--input name="Text_To_Replace" type="text" class="input-field" placeholder="Enter text to find and replace"-->
+        <div class="button-wapper">
+          <button type="submit" id="find" name="find" class="hero-btn" value="find">Find</button>
+          <button type="submit" id="img" name="img" class="hero-btn" value="img">Image</button>
           <button id="save" name="save" type="submit" class="hero-btn mx-3" value="{{save_btn}}" formnovalidate disabled>
             {% if save_btn == "save" %}
-            Save
+              Save
             {% else %}
-            Undo
+              Undo
             {% endif %}
           </button>
           <button id="push" name="push" type="submit" class="hero-btn" formnovalidate disabled>Push</button>
-          </div>
-          
-        </form>
-      </div>
-      {% if Table_Length != 0 %}
-      <div class="table-responsive">
-        <h2 class="text-center">Replace place</h2>
-        <table class="table table-success table-striped table-hover">
-          <caption>List of found text</caption>
-          <thead>
-            <tr>
-              <th scope="col">S/N</th>
-              <th scope="col">Tag</th>
-              <th scope="col">Text</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for x in Table %}
+        </div>
+        
+      </form>
+    </div>
+      {% if Text_Table_Length != 0 %}
+        <div class="table-responsive">
+          <h2 class="text-center">Replace place</h2>
+          <table class="table table-success table-striped table-hover">
+            <caption>List of found text</caption>
+            <thead>
               <tr>
-                <td></td>
-                <td>{{x.0}}</td>
-                <td>{{x.1}}</td>
-                <!--td>
-                  <form method="post" action="">
-                    <input name="Where_To_Change" type="hidden" value="{{x}}">
-                    <input name="Replace_Text_With" type="text" class="input-field" style="color:black;" placeholder="Enter what the text has to be replaced with">
-                    <button type="submit" class="btn btn-primary btn-sm my-2">Change This</button>
-                  </form>
-                </td-->
-                <td>
-                  <form method="post" action="">
-                    {% csrf_token %}
-                    {% if client_req_urls %}
-                    <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
-                    {% endif %}
-                    <input name="Where_To_Change" type="hidden" value="{{x.2}}">
-                    <input name="Text_To_Replace" style="color:black;" type="text" class="input-field" placeholder="Replace What?">
-                    <input name="Replace_Text_With" style="color:black;" type="text" class="input-field" placeholder="Replace With?">
-                    <label>Font Size: </label><input name="Replace_Font_With" value="{{x.3}}" type="number" min="1" style="color:black;" class="input-field2"></input>
-                    <label>Font Color: </label><input name="Replace_Color_With" id="{{x.2}}" value="{{x.4}}" type="color" class="input-field3 mx-2"></input>
-                    <button type="submit" class="btn btn-primary btn-sm">Change This</button>
-                  </form>
-                </td>
+                <th scope="col">S/N</th>
+                <th scope="col">Tag</th>
+                <th scope="col">Text</th>
+                <th></th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {% for x in Text_Table %}
+                <tr>
+                  <td></td>
+                  <td>{{x.0}}</td>
+                  <td>{{x.1}}</td>
+                  <td>
+                    <form method="post" action="" >
+                      {% csrf_token %}
+                      
+                      {% if client_req_urls %}
+                      <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
+                      {% endif %}
+                      {% if Path_To_Search %}
+                      <input type="hidden" name="Path_To_Search" id="Path_To_Search" value="{{Path_To_Search}}" required>
+                      {% endif %}
+                      <input type="hidden" name="index", value={{ x.5 }} >
+                      <input type="hidden" name="color_change" id="color_change_{{x.5}}" value="false" required>
+
+                      <input name="Where_To_Change" type="hidden" value="{{x.2}}">
+                      <input name="Text_To_Replace" style="color:black;" type="text" class="input-field" placeholder="Replace What?">
+                      <input name="Replace_Text_With" style="color:black;" type="text" class="input-field" placeholder="Replace With?">
+                      <label>Font Size: </label><input name="Replace_Font_With" value="{{x.3}}" type="number" min="1" style="color:black;" class="c-input-field2 c-border"></input>
+                      <label>Font Color: </label><input name="Replace_Color_With" id="color_{{x.5}}" value="{{x.4}}" type="color" class="c-input-field3 cx-2" onchange="color_changer(this)"></input>
+                      <br><br>
+                      <button type="submit" class="btn btn-primary btn-sm">Change This</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      {% elif Image_Table_Length != 0 %}
+        <div class="table-responsive">
+          <h2 class="text-center">Replace place</h2>
+          <table class="table table-success table-striped table-hover">
+            <caption>List of found images</caption>
+            <thead>
+              <tr>
+                <th scope="col">S/N</th>
+                <th scope="col">Current Image</th>
+                <th scope="col">Image</th>
+                <th scope="col">Image Index</th>
+                <th scope="col">Available Images</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for x in Image_Table %}
+                <tr>
+                  <td></td>
+                  <td>{{x.0}}</td>
+                  <td><img src="{% static x.1.src %}" width="80px" height="80px"></td>
+                  <td>{{x.2|add:'1'}} </td>
+
+                  <td>
+                    <form method="post" action="" enctype="multipart/form-data">
+                      {% csrf_token %}
+
+                      {% if client_req_urls %}
+                      <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
+                      {% endif %}
+                      {% if Path_To_Search %}
+                      <input type="hidden" name="Path_To_Search" id="Path_To_Search" value="{{Path_To_Search}}" required>
+                      {% endif %}
+                      
+                      <input type="hidden" name="current_src", value="{{ x.1.src }}" >
+                      <input type="hidden" name="index", value="{{ x.2 }}" >
+                      
+                      {% if x.1.available_images %}
+                      <select id="available_images" name="available_images" class="input-field1" onchange="check_upload(this)" style="color:#000000;">
+                        <option class="dropdown" value="select_availaible_image" selected>Select Available Image</option>
+                        {% for x in x.1.available_images %}
+                        <option class="dropdown" value="{{x.1}}">{{x.0}}</option>
+                        {% endfor %}
+                      </select>
+                      {% endif %}
+                      <br><br>
+                      <input type="file" id="myFile" name="filename">
+                      <label for="width">Width:</label><input id="width" name="width" class="c-input-field2 c-border">
+                      <label for="height">Height:</label><input id="height" name="height" class="c-input-field2 c-border">
+                      <br><br>
+                      <!-- <input type="submit" class="btn btn-primary btn-sm">Change This</input> -->
+                      <button type="submit" class="btn btn-primary btn-sm">Change This</button>
+                    </form>
+                  </td>
+                  <!-- <td>
+                    <form method="post" action="">
+                      {% csrf_token %}
+                      {% if client_req_urls %}
+                      <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
+                      {% endif %}
+                      <input name="Where_To_Change" type="hidden" value="{{x.2}}">
+                      <input name="Text_To_Replace" style="color:black;" type="text" class="input-field" placeholder="Replace What?">
+                      <input name="Replace_Text_With" style="color:black;" type="text" class="input-field" placeholder="Replace With?">
+                      <label>Font Size: </label><input name="Replace_Font_With" value="{{x.3}}" type="number" min="1" style="color:black;" class="input-field2"></input>
+                      <label>Font Color: </label><input name="Replace_Color_With" id="{{x.2}}" value="{{x.4}}" type="color" class="input-field3 mx-2"></input>
+                      <button type="submit" class="btn btn-primary btn-sm">Change This</button>
+                    </form>
+                  </td> -->
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
       {% else %}
-      <h2 class="text-center">No Text Found</h2>
+        <h2 class="text-center">Nothing Found</h2>
       {% endif %}
     </section>
     <script>
       var SaveButton = document.getElementById('save');
       var PushButton = document.getElementById('push');
-      {% if msg == "Success. Please save the changes" %}
+      var available_images = document.getElementById('available_images');
+      var upload_file = document.getElementById('myFile')
+      
+
+      {% if msg == "Success. Please save the changes" %} 
         SaveButton.disabled = false;
       {% endif %}
       {% if msg == "Success. Please push the changes" %}
@@ -126,6 +210,28 @@
         SaveButton.disabled = true;
         PushButton.disabled = true;
       {% endif %}
+
+      function check_upload(selectObject) {
+        var value = selectObject.value;  
+        if (value != "select_availaible_image") {
+          upload_file.disabled = true;
+        } else {
+          upload_file.disabled = false;
+        }
+      }
+
+      function color_changer(object) {
+        
+        var object_id = object.id;
+        var ch = object_id.charAt(object_id.length - 1);
+        var element_id = 'color_change' + '_' + ch;
+        var color_change_input = document.getElementById(element_id);
+        
+        if (color_change_input.value == "false") {
+          color_change_input.value = "true";
+        }
+      }
+
     </script>
   {% else %}
     <br>

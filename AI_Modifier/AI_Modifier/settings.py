@@ -29,10 +29,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # During development only
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# if DEBUG:
+#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # During development only
+# else:
+#     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Application definition
 
@@ -130,9 +131,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+REPO_DIR = os.path.join(os.path.join(BASE_DIR, 'static'), 'All_Repo')
+
 STATIC_URL = 'static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_media/')
+
+STATICFILES_DIRS = [
+    # os.path.join(BASE_DIR, 'static'),
+    '/home/hestabit/Python Projects/my_new_code/AI_Modifier_Django/AI_Modifier/static/All_Repo/Demo-CM/static/images',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
