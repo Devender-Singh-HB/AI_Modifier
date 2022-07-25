@@ -8,8 +8,8 @@
     <div class="header_btn">
       <strong><p>User: {{user.name}}</p></strong>
       <div class="btnn">
-        <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
         <button type="submit" class="logout-btn"><a href="{% url 'index' %}">Cancel</a></button>
+        <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
       </div>
     </div>
     <div>
@@ -52,7 +52,7 @@
         </select>
         <!--input name="Text_To_Replace" type="text" class="input-field" placeholder="Enter text to find and replace"-->
         <div class="button-wapper">
-          <button type="submit" id="find" name="find" class="hero-btn" value="find">Find</button>
+          <button type="submit" id="find" name="find" class="hero-btn" value="find">Text</button>
           <button type="submit" id="img" name="img" class="hero-btn" value="img">Image</button>
           <button id="save" name="save" type="submit" class="hero-btn mx-3" value="{{save_btn}}" formnovalidate disabled>
             {% if save_btn == "save" %}
@@ -67,24 +67,22 @@
       </form>
     </div>
       {% if Text_Table_Length != 0 %}
-        <div class="table-responsive">
+        <div class="table-responsive text-align-center">
           <h2 class="text-center">Replace place</h2>
           <table class="table table-success table-striped table-hover">
-            <caption>List of found text</caption>
+            <caption class="text-align-center">List of found text</caption>
             <thead>
               <tr>
-                <th scope="col">S/N</th>
-                <th scope="col">Tag</th>
-                <th scope="col">Text</th>
-                <th></th>
+                <th scope="col" >S/N</th>
+                <th scope="col" >Tag</th>
+                <th scope="col" >Change</th>
               </tr>
             </thead>
             <tbody>
               {% for x in Text_Table %}
                 <tr>
-                  <td></td>
-                  <td>{{x.0}}</td>
-                  <td>{{x.1}}</td>
+                  <td ></td>
+                  <td >{{x.0}}</td>
                   <td>
                     <form method="post" action="" >
                       {% csrf_token %}
@@ -97,14 +95,22 @@
                       {% endif %}
                       <input type="hidden" name="index", value={{ x.5 }} >
                       <input type="hidden" name="color_change" id="color_change_{{x.5}}" value="false" required>
+                      <div class="text-flex">
+                        <!-- <span><strong>Text:</strong></span> -->
+                        {% if x.4|length > 0 %}
+                          <label style="color: {{x.4}}; font-size: {{x.3}}px;">{{x.1}}</label>
+                        {% else %}
+                          <label style="color: black; font-size: {{x.3}}px;">{{x.1}}</label>
+                        {% endif %}
+                      </div>
+                      <input name="Replace_Text_With" value="{{x.1}}" style="color:black;" type="text" class="input-field text-align-center">
 
-                      <input name="Where_To_Change" type="hidden" value="{{x.2}}">
-                      <input name="Text_To_Replace" style="color:black;" type="text" class="input-field" placeholder="Replace What?">
-                      <input name="Replace_Text_With" style="color:black;" type="text" class="input-field" placeholder="Replace With?">
-                      <label>Font Size: </label><input name="Replace_Font_With" value="{{x.3}}" type="number" min="1" style="color:black;" class="c-input-field2 c-border"></input>
-                      <label>Font Color: </label><input name="Replace_Color_With" id="color_{{x.5}}" value="{{x.4}}" type="color" class="c-input-field3 cx-2" onchange="color_changer(this)"></input>
-                      <br><br>
-                      <button type="submit" class="btn btn-primary btn-sm">Change This</button>
+                      <div class="c-form">
+                        <label class="c-label">Font Size: </label><input name="Replace_Font_With" value="{{x.3}}" type="number" min="1" style="color:black;" class="c-input-field2 c-border"></input>
+                        <label class="c-label">Font Color: </label><input name="Replace_Color_With" id="color_{{x.5}}" value="{{x.4}}" type="color" class="c-input-field3 cx-2" onchange="color_changer(this)"></input>
+                        <br><br>
+                        <button type="submit" class="btn btn-primary btn-sm">Change This</button>
+                      </div>
                     </form>
                   </td>
                 </tr>
@@ -114,10 +120,10 @@
         </div>
 
       {% elif Image_Table_Length != 0 %}
-        <div class="table-responsive">
+        <div class="table-responsive text-align-center">
           <h2 class="text-center">Replace place</h2>
           <table class="table table-success table-striped table-hover">
-            <caption>List of found images</caption>
+            <caption class="text-align-center">List of found images</caption>
             <thead>
               <tr>
                 <th scope="col">S/N</th>
@@ -136,35 +142,39 @@
                   <td>{{x.2|add:'1'}} </td>
 
                   <td>
-                    <form method="post" action="" enctype="multipart/form-data">
-                      {% csrf_token %}
+                    <div style="align-items: center; display: flex;" >
+                      <form method="post" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-                      {% if client_req_urls %}
-                      <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
-                      {% endif %}
-                      {% if Path_To_Search %}
-                      <input type="hidden" name="Path_To_Search" id="Path_To_Search" value="{{Path_To_Search}}" required>
-                      {% endif %}
-                      
-                      <input type="hidden" name="current_src", value="{{ x.1.src }}" >
-                      <input type="hidden" name="index", value="{{ x.2 }}" >
-                      
-                      {% if x.1.available_images %}
-                      <select id="available_images" name="available_images" class="input-field1" onchange="check_upload(this)" style="color:#000000;">
-                        <option class="dropdown" value="select_availaible_image" selected>Select Available Image</option>
-                        {% for x in x.1.available_images %}
-                        <option class="dropdown" value="{{x.1}}">{{x.0}}</option>
-                        {% endfor %}
-                      </select>
-                      {% endif %}
-                      <br><br>
-                      <input type="file" id="myFile" name="filename">
-                      <label for="width">Width:</label><input id="width" name="width" class="c-input-field2 c-border">
-                      <label for="height">Height:</label><input id="height" name="height" class="c-input-field2 c-border">
-                      <br><br>
-                      <!-- <input type="submit" class="btn btn-primary btn-sm">Change This</input> -->
-                      <button type="submit" class="btn btn-primary btn-sm">Change This</button>
-                    </form>
+                        {% if client_req_urls %}
+                        <input type="hidden" name="client_req_urls" id="client_req_urls" value={{client_req_urls}} required>
+                        {% endif %}
+                        {% if Path_To_Search %}
+                        <input type="hidden" name="Path_To_Search" id="Path_To_Search" value="{{Path_To_Search}}" required>
+                        {% endif %}
+                        
+                        <input type="hidden" name="current_src", value="{{ x.1.src }}" >
+                        <input type="hidden" name="index", value="{{ x.2 }}" >
+                        
+                        {% if x.1.available_images %}
+                        <select id="available_images" name="available_images" class="input-field1" onchange="check_upload(this)" style="color:#000000;">
+                          <option class="dropdown" value="select_availaible_image" selected>Select Available Image</option>
+                          {% for x in x.1.available_images %}
+                          <option class="dropdown" value="{{x.1}}">{{x.0}}</option>
+                          {% endfor %}
+                        </select>
+                        {% endif %}
+                        <br><br>
+                        <input type="file" id="myFile" name="filename">
+                        <div class="c-form">
+                          <label for="width">Width:</label><input id="width" name="width" class="c-input-field2 c-border">
+                          <label for="height">Height:</label><input id="height" name="height" class="c-input-field2 c-border">
+                          <br><br>
+                          <!-- <input type="submit" class="btn btn-primary btn-sm">Change This</input> -->
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Change This</button>
+                      </form>
+                    </div>
                   </td>
                   <!-- <td>
                     <form method="post" action="">
@@ -195,21 +205,35 @@
       var PushButton = document.getElementById('push');
       var available_images = document.getElementById('available_images');
       var upload_file = document.getElementById('myFile')
-      
+      var msg = "{{msg}}";
+      var save_btn = "{{save_btn}}";
 
-      {% if msg == "Success. Please save the changes" %} 
+      if (msg == "Success. Please save the changes") {
         SaveButton.disabled = false;
-      {% endif %}
-      {% if msg == "Success. Please push the changes" %}
+      }
+      
+      else if (msg == "Success. Please push the changes") {
         SaveButton.disabled = false;
         PushButton.disabled = false;
-      {% elif msg == "Changes successfully restored" %}
+      }
+      else if (msg == "Changes successfully restored") {
         SaveButton.disabled = true;
-      {% endif %}
-      {% if msg == "Changes have been pushed successfully" or msg == "Error! Please try again later" %}
-        SaveButton.disabled = true;
+      }
+  
+      else if ((msg == "Changes have been pushed successfully") || (msg == "Error! Please try again later")){
         PushButton.disabled = true;
-      {% endif %}
+      }
+
+      if (save_btn == "save") {
+        SaveButton.hidden = true;
+        PushButton.hidden = true;
+      }
+      else {
+        SaveButton.hidden = false;
+        PushButton.hidden = false;
+      }
+
+
 
       function check_upload(selectObject) {
         var value = selectObject.value;  
@@ -222,9 +246,11 @@
 
       function color_changer(object) {
         
-        var object_id = object.id;
-        var ch = object_id.charAt(object_id.length - 1);
+        const object_id_arr = object.id.split('_');
+        
+        var ch = object_id_arr[object_id_arr.length-1];
         var element_id = 'color_change' + '_' + ch;
+        console.log(element_id);
         var color_change_input = document.getElementById(element_id);
         
         if (color_change_input.value == "false") {

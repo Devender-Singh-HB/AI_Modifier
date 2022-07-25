@@ -15,10 +15,10 @@ class ProfileAdmin(UserAdmin):
     add_form = UserRegisterForm
     search_fields = ('email', 'name',)
     ordering = ('name',)
-    list_display = ('name', 'email', 'is_active', 'is_staff', 'is_superuser')
+    list_display = ('name', 'email', 'is_active', 'is_staff', 'is_superuser',)
 
     fieldsets = (
-        (None, {'fields': ('email', 'name',)}),
+        (None, {'fields': ('email', 'name', 'password',)}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )
 

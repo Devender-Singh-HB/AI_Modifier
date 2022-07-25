@@ -170,7 +170,7 @@ def add_request(request: Any) -> TemplateResponse:
     return TemplateResponse(request, 'accounts/add_request.html', {'message': 'Add new request'})
 
 
-def get_images(dir: str) -> list:
+def get_images(dir: str, dir_level:int) -> list:
     """
     Check all directories within 'dir' and get all images(jpg,png and jpeg).
     
@@ -185,9 +185,9 @@ def get_images(dir: str) -> list:
         
         # for all files found in 'filenames'
         for filename in filenames:
-            
+            file_level = len(root.split('/')) + 1
             # check if filname is an images
-            if filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg'):
+            if file_level == dir_level and (filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg')):
                 
                 # add image's path to the result
                 res.append([filename, os.path.join(root, filename)])
@@ -224,7 +224,7 @@ def get_all_images(soup: BeautifulSoup, img_list: list) -> list:
                     # 'all other images in that directory' and 'index of img' soup element.
                     response_table.append([img_list_element.split('/')[-1].split('.')[0], 
                                            {'src': img_list_element[len(REPO_DIR)-8:], 
-                                            'available_images': get_images(img_list_element[:img_list_element.rfind('/')])}, 
+                                            'available_images': get_images(img_list_element[:img_list_element.rfind('/')], len(img_list_element.split('/')))}, 
                                            idx])
                     
         except Exception as e: 
@@ -284,7 +284,7 @@ def get_all_web_elements(soup: BeautifulSoup) -> list:
             color = ""
             
         # create attribute list of web element
-        temp = [tag, soup_string, text ,size, color, idx]
+        temp = [tag, soup_string.strip(), text ,size, color, idx]
         
         # append attribute list to Response_Table
         response_Table.append(temp)
@@ -339,19 +339,6 @@ def change_request(request: Any) -> TemplateResponse:
                                          })
                 
             else:
-                # global Repo_Path
-                # global Repo_Name
-                # global Branch_Name
-                # global Text_To_Replace
-                # global Path_To_Search
-                # global Response_Table
-                # global Response_Table_Length
-                # global original_soup
-                # global soup
-                # global repo
-                # global save_btn
-                # global content_btn
-                # global Html_List
                 
                 # Initialize 
                 msg = ""
@@ -359,8 +346,7 @@ def change_request(request: Any) -> TemplateResponse:
                 content_btn = "text"
                 
                 # check is 'Path_To_Search' in form
-                if 'Path_To_Search' in request.POST:
-                    
+                if 'Path_To_Search' in request.POST:                    
                     # get 'Path_To_Search' value 
                     Path_To_Search = request.POST['Path_To_Search']
                 else:
@@ -448,13 +434,14 @@ def change_request(request: Any) -> TemplateResponse:
                             
                             Response_Image_Table_Length = len(Response_Image_Table)
                     
-                elif 'Replace_Text_With' in request.POST and 'Text_To_Replace' in request.POST and 'Where_To_Change' in request.POST:
+                # elif 'Replace_Text_With' in request.POST and 'Text_To_Replace' in request.POST and 'Where_To_Change' in request.POST:
+                elif 'Replace_Text_With' in request.POST:
                     
                     with open(Path_To_Search) as fp:
                         soup = BeautifulSoup(fp, 'html.parser')
                         
-                    Where_To_Change = request.POST['Where_To_Change']
-                    Text_To_Replace = request.POST['Text_To_Replace']
+                    # Where_To_Change = request.POST['Where_To_Change']
+                    # Text_To_Replace = request.POST['Text_To_Replace']
                     Replace_Text_With = request.POST['Replace_Text_With']
                     Replace_Font_With = request.POST['Replace_Font_With']
                     Replace_Color_With = request.POST['Replace_Color_With']
@@ -509,7 +496,8 @@ def change_request(request: Any) -> TemplateResponse:
                         
                         print(element['style'])
                         
-                    element.string = element.string.replace(Text_To_Replace,Replace_Text_With)
+                    # element.string = element.string.replace(Text_To_Replace,Replace_Text_With)
+                    element.string = Replace_Text_With
                     print(f'Text: {element.text}')
                     
                     with open(Path_To_Search, "w") as fp:
@@ -521,160 +509,117 @@ def change_request(request: Any) -> TemplateResponse:
                     Response_Table_Length = len(Response_Table)
                     save_btn = "undo"
                     
-                    # Replace the text in the soup
-                    # save_btn = "save"
-                    # with open(Path_To_Search) as fp:
-                    #     original_soup = BeautifulSoup(fp, 'html.parser')
-                    #     soup = original_soup
-                    # Where_To_Change = request.POST['Where_To_Change'].replace('\r', '')
-                    # Old_font = str(Where_To_Change)
-                    # Text_To_Replace = request.POST['Text_To_Replace']
-                    # Replace_Text_With = request.POST['Replace_Text_With']
-                    # Where_To_Change = BeautifulSoup(Where_To_Change, 'html.parser')
-                    # Duplicate_Where_To_Change = Where_To_Change
-                    # tag = str(Where_To_Change).split("<")[1].split(">")[0]
-                    # if " " in tag: tag = tag.split(" ")[0]
-                    # if "Replace_Font_With" in request.POST and request.POST['Replace_Font_With'] != "":
-                    #     try:
-                    #         if(Where_To_Change.find(tag)['style']):
-                    #             Change_Text = str(Where_To_Change.find(tag)['style']).replace('\r', '')
-                    #             if "font-size" in Change_Text:
-                    #                 temp1 = str(Change_Text.split("font-size:")[1].split("px;")[0])
-                    #                 temp2 = str(request.POST['Replace_Font_With'])
-                    #                 Change_Text = Change_Text.replace(temp1, temp2)
-                    #             else:
-                    #                 temp1 = str(Change_Text.split(";")[0])
-                    #                 temp2 = str(request.POST['Replace_Font_With'])
-                    #                 temp2 = temp1 + ";font-size:" + temp2 + "px"
-                    #                 Change_Text = Change_Text.replace(temp1, temp2)
-                    #             Where_To_Change.find(tag)['style'] = Change_Text
-                    #     except:
-                    #         temp2 = str(request.POST['Replace_Font_With'])
-                    #         Where_To_Change.find(tag)['style'] = f'font-size:{temp2}px;'
-                            
-                    # if "Replace_Color_With" in request.POST and request.POST['Replace_Color_With'] != "#000000":
-                    #     try:
-                    #         if(Where_To_Change.find(tag)['style']):
-                    #             Change_Text = str(Where_To_Change.find(tag)['style'])
-                    #             if "color" in Change_Text:
-                    #                 temp1 = str(Change_Text.split("color:")[1].split(";")[0])
-                    #                 temp2 = str(request.POST['Replace_Color_With'])
-                    #                 Change_Text = Change_Text.replace(temp1, temp2)
-                    #             else:
-                    #                 temp1 = str(Change_Text.split(";")[0])
-                    #                 temp2 = str(request.POST['Replace_Color_With'])
-                    #                 temp2 = temp1 + ";color:" + temp2
-                    #                 Change_Text = Change_Text.replace(temp1, temp2)
-                    #             Where_To_Change.find(tag)['style'] = Change_Text
-                    #     except:
-                    #         temp2 = str(request.POST['Replace_Color_With'])
-                    #         Where_To_Change.find(tag)['style'] = f'color:{temp2};'
-                            
-                    # New_font = str(Where_To_Change)
-                    # soup = str(soup)
-                    # if(Old_font in soup): 
-                    #     soup = soup.replace(Old_font, New_font)
-                        
-                    # original_soup = str(original_soup)
                     
-                    # if(Old_font in original_soup): 
-                    #     original_soup = original_soup.replace(Old_font, New_font)
-                        
-                    # soup = BeautifulSoup(soup, "html.parser")
-                    # original_soup = BeautifulSoup(original_soup, "html.parser")
-                    
-                    # if Text_To_Replace != '' and Replace_Text_With != '':
-                    #     Soup_Changer = Where_To_Change.string.replace(Text_To_Replace, Replace_Text_With)
-                        
-                    #     # display soup text change
-                    #     for x in soup.find_all(tag, text = re.compile(str(Where_To_Change.string.strip()))):
-                    #         if str(x) == str(Duplicate_Where_To_Change):
-                    #             Changer = x
-                    #             break
-                    #     # Changer = soup.find(Where_To_Change)
-                    #     # Changer = soup.find(text = re.compile(str(Where_To_Change.string.strip())))
-                    #     print(f"Changer: {Changer}")
-                    #     Changer.string.replace_with(Soup_Changer)
-                    #     print(Changer)
-                    #     # raise Exception("Intended")
-                    #     # original_soup text change
-                    #     # Changer2 = original_soup.find_all(tag= '', text = re.compile(str(Where_To_Change.string.strip())))
-                    #     # Changer2 = original_soup.find('title style="font-size:18px;color:#b80a0a;"' ,text = re.compile(str(Where_To_Change.string.strip())))
-                    #     # Changer2.replace_with(Soup_Changer)
-                    #     # Changer2 = original_soup.find(tag=Where_To_Change.parent, text = str(Where_To_Change.string))
-                    #     for x in original_soup.find_all(tag, text = re.compile(str(Where_To_Change.string.strip()))):
-                    #         if str(x) == str(Duplicate_Where_To_Change):
-                    #             Changer2 = x
-                    #             break
-                    #     Changer2.string.replace_with(Soup_Changer)
-                    #     # print(Changer)
-                        
-                    # with open(Path_To_Search, "w") as fp:
-                    #     fp.write(soup)
-                    
-                    # msg = "Success. Please push the changes"
-                    
-                    # Response_Table = get_all_web_elements(soup)
-                    # Response_Table_Length = len(Response_Table)
-                    # save_btn = "undo"
-                
                 elif 'current_src' in request.POST:
                     
-                    with open(Path_To_Search) as fp:
-                        original_soup = BeautifulSoup(fp, 'html.parser')
+                    # Check if atleast one of the option is present 
+                    # either image is selected or image is uploaded
+                    if request.POST['available_images'] != "select_availaible_image" or len(request.FILES) != 0:
                         
-                    width, height = None, None
+                        # open Path_To_Search html file 
+                        with open(Path_To_Search) as fp:
+                            original_soup = BeautifulSoup(fp, 'html.parser')
                         
-                    if request.POST['width'] != '':
-                        width = int(request.POST['width'])
+                        # Initialize width and height to None
+                        width, height = None, None
                         
-                    if request.POST['height'] != '':
-                        height = int(request.POST['height'])
-                    
-                    file_exists = False
-                    
-                    
-                    # save image in directory 
-                    if request.POST['available_images'] == "select_availaible_image":
-                        current_src = request.POST['current_src']
-                        name = request.FILES["filename"].name
-                        
-                        # reading and saving the image in the same directory as current image
-                        image_location = f"{REPO_DIR[:REPO_DIR.rfind('All_Repo')]}{current_src[:current_src.rfind('/')+1]}{name}"
-                        if not os.path.exists(image_location):
-                            try:
-                                image = Image.open(io.BytesIO(request.FILES["filename"].file.read()))
-                                image.save(image_location)
-                                img_list.append(image_location)
-                            except:
-                                pass
-
-                        else:
-                            file_exists = True
-                        
-                    else:
-                        name = request.POST['available_images'].split('/')[-1]
-                    
-                    msg = "Success. Please push the changes"
-                    save_btn = "undo"
-                    
-                    if file_exists:
-                        msg = "File already exists with same name. Please change file name."
-                        save_btn = "save"   
-                    else:
-                        image_to_change = original_soup.find_all('img')[int(request.POST['index'])]
-                        new_src = f"{image_to_change['src'][:image_to_change['src'].rfind('/')+1]}{name}"
-                        image_to_change['src'] = new_src
-
-                        if width:
-                            image_to_change['width'] = width
-                        
-                        if height:
-                            image_to_change['height'] = height
-                    
-                        with open(Path_To_Search, "w") as fp:
-                                fp.write(original_soup.prettify())
+                        # Check if width is present in request   
+                        if request.POST['width'] != '':
                             
+                            # set width
+                            width = int(request.POST['width'])
+                            
+                        # Check if height is present in request
+                        if request.POST['height'] != '':
+                            
+                            # set height
+                            height = int(request.POST['height'])
+                        
+                        # Initialize file_exists to None
+                        file_exists = False
+                        
+                        # get current source of image relative to repository
+                        current_src = request.POST['current_src']
+                        
+                        # If image is uploaded by user
+                        if request.POST['available_images'] == "select_availaible_image":
+                            
+                            # get image name 
+                            name = request.FILES["filename"].name
+                            
+                            # reading and saving the image in the same directory as current image
+                            image_location = f"{REPO_DIR[:REPO_DIR.rfind('All_Repo')]}{current_src[:current_src.rfind('/')+1]}{name}"
+                            
+                            # check if image is not already present in that directory
+                            if not os.path.exists(image_location):
+                                
+                                # try and save image 
+                                try:
+                                    
+                                    # read image data from Bytes
+                                    image = Image.open(io.BytesIO(request.FILES["filename"].file.read()))
+                                    
+                                    # save image to location
+                                    image.save(image_location)
+                                    
+                                    # append newly created image to image_list
+                                    img_list.append(image_location)
+                                except:
+                                    pass
+
+                            else:
+                                
+                                # image already exists, set file_exists to True
+                                file_exists = True
+                            
+                        # image is selected from dropdown
+                        else:
+                            
+                            # get image name 
+                            name = request.POST['available_images'].split('/')[-1]
+                        
+                        # set message and save_btn value for html rendering
+                        msg = "Success. Please push the changes"
+                        save_btn = "undo"
+                        
+                        # Change value of message and save_btn if file already exists
+                        if file_exists:
+                            msg = "File already exists with same name. Please change file name."
+                            save_btn = "save"   
+                            
+                        # Change source of image tag 
+                        else:
+                            
+                            # get img tag at index
+                            image_to_change = original_soup.find_all('img')[int(request.POST['index'])]
+                            
+                            # construct new source path 
+                            new_src = f"{image_to_change['src'][:image_to_change['src'].rfind('/')+1]}{name}"
+                            
+                            # set new source path to selected image
+                            image_to_change['src'] = new_src
+
+                            # if width is not None
+                            if width:
+                                
+                                # set width value
+                                image_to_change['width'] = width
+                            
+                            # if height is not None
+                            if height:
+                                
+                                # set height value
+                                image_to_change['height'] = height
+
+                            # write changed contents to the html file
+                            with open(Path_To_Search, "w") as fp:
+                                    fp.write(original_soup.prettify())
+                                    
+                    # Nither image is selected from dropdown, nor image is uploaded
+                    else:
+                        msg = "Please select image from dropdown or upload an image"
+                        save_btn = "save"
+                    
                     with open(Path_To_Search) as fp:
                         soup = BeautifulSoup(fp, 'html.parser') 
                         
@@ -683,8 +628,6 @@ def change_request(request: Any) -> TemplateResponse:
                                                               img_list=img_list)   
                                                     
                         Response_Image_Table_Length = len(Response_Image_Table)
-                        
-                        
 
                   
                 elif 'save' in request.POST and 'push' not in request.POST:
@@ -701,6 +644,7 @@ def change_request(request: Any) -> TemplateResponse:
                         save_btn = "undo"
                         
                     else:
+                        repo = git.Repo(Repo_Name)
                         repo.git.stash("save")
                         msg = "Changes successfully restored"
                         save_btn = "save"
@@ -717,15 +661,6 @@ def change_request(request: Any) -> TemplateResponse:
                     
                 elif 'push' in request.POST:
                     
-                    # Push the changes to the github repository
-                    # try:
-                    #     repo.git.add(update=True)
-                    #     repo.index.commit(Commit_Message)
-                    #     origin = repo.remote(name='origin')
-                    #     origin.push()
-                    #     msg = "Changes have been pushed successfully"
-                    # except:
-                    #     msg = "Error! Please try again later"
                     try:
                         change_request = ChangeRequest(client_request=client_request, repo=Repo_Name)
                         change_request.save()
@@ -733,13 +668,7 @@ def change_request(request: Any) -> TemplateResponse:
                     except:
                         msg = "Failed to push changes!"
                         
-                    # TemplateResponse(request, "accounts/change_request.html", {'Html_List':Html_List, 'Table':Response_Table, 'Table_Length':Response_Table_Length, 'msg':msg, 'save_btn':save_btn})
                     
-                else:
-                    Html_List = []
-                    Response_Table = []
-                    Response_Table_Length = len(Response_Table)
-                
                 return TemplateResponse(request, 
                                         "accounts/change_request.html", 
                                         {'user':profile, 

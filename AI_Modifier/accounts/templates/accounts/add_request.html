@@ -11,12 +11,16 @@
         {% endif %}
 
         {% if user.is_authenticated %}
-            <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
-            <button type="submit" class="logout-btn"><a href="{% url 'index' %}">Cancel</a></button>
+            <div class="btnn">
+                <strong><p>User: {{user.name}}</p></strong>
+                <div style="display: flex;">
+                    <button type="submit" class="logout-btn" style="margin-right:10px"><a href="{% url 'index' %}">Cancel</a></button>
+                    <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
+                </div>
+            </div>
+            <br><br>
 
-            <strong><p>User: {{user.name}}</p></strong>
-
-            <form action="{% url 'add_request' %}" method="post">
+            <form action="{% url 'add_request' %}" method="post" class="client_change_req_form">
                 {% csrf_token %}
                 <label for="url">URL</label>
                 <br>

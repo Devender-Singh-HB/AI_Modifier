@@ -10,7 +10,7 @@ h1 {
 }
 
 form {
-  max-width: 80%;
+  /* max-width: 80%; */
   box-shadow: 0 0 10px #000;
   margin: 0 auto;
   padding: 30px;
@@ -88,7 +88,8 @@ background-color: transparent;
   font-weight: 300;
   padding-right: 0;
   display: block;
-  margin: 0 0 0 auto;
+  /* margin: 0 0 0 auto; */
+  margin-left: auto;
 }
 
 .login-btn {
@@ -111,7 +112,6 @@ background-color: transparent;
   text-align: center;
   font-size: 22px;
   font-weight: 600;
-  padding-left: 20%;
 }
 
 .forget-instruction {
@@ -310,5 +310,49 @@ box-sizing: border-box;
 .c-border {
   border: 1px solid rgb(0, 0, 0);
 }
-.btnn{display: flex;}
+.c-form {
+  display: flex; 
+  align-items: center;
+}
+.c-label {
+  color: #000;
+}
+.c-btn {
+  align-items: center;
+}
+.client_req_form {
+  max-width: 80%;
+  text-align: center;
+}
+
+.client_login_form {
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 30px;
+}
+.client_change_req_form {
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.btnn{
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.btnn-child {
+  /* margin-left: auto; */
+  padding-right: 20px;
+}
 .header_btn button{margin: 0 10px;background-color: transparent;}

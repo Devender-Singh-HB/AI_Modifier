@@ -10,10 +10,12 @@
         {% endif %}
 
         {% if user.name %}
-            <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
-
-            <strong><p>Hello {{user.name}}</p></strong>
+            <div style="display: flex;">
+                <strong><p>Hello {{user.name}}</p></strong>
+                <button type="submit" class="logout-btn"><a href="{% url 'logout' %}">Log out</a></button>
+            </div>
             <button type="submit" class="add-request-btn" ><a href="{% url 'add_request' %}">Add Request</a></button>
+            <br><br>
 
             {% if urls %}
             <form class="client_req_form" action="{% url 'change_request' %}" method = "POST">
