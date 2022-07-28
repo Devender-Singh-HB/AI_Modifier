@@ -77,6 +77,15 @@
                 {% endif %}
                 <br><br>
 
+                <label for="port">Port</label>
+                <br>
+                {% if port >= 0 %}
+                <input type="text" name="port" id="port" value={{port}} required>
+                {% else %}
+                <input type="text" name="port" id="port" required>
+                {% endif %}
+                <br><br>
+
                 <input type="hidden" name="email" id="email" value={{user.email}} required>
                 
                 {% if edit_request %}

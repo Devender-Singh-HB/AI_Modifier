@@ -10,6 +10,7 @@ class ClientRequest(models.Model):
     token = models.CharField(max_length=200, verbose_name='Access Token')
     version_control = models.CharField(max_length=50, verbose_name='Version Control')
     branch = models.CharField(max_length=50, null=True, blank=True, verbose_name='Branch')
+    port = models.PositiveIntegerField(default=0, verbose_name='Port')
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='client_request')
     
     def __str__(self):

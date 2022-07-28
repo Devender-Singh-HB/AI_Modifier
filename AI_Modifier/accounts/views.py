@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 import re
 from pathlib import Path
 import io
+import ftplib
+import shutil
 try:
     import PIL.Image as Image
 except: 
@@ -138,6 +140,7 @@ def add_request(request: Any) -> TemplateResponse:
                     token=request.POST['token'],
                     version_control=request.POST['version_control'],
                     branch=request.POST['branch'],
+                    port=request.POST['port'],
                     profile=Profile.objects.get(email=request.POST['email'])
                 )
                 
@@ -151,6 +154,7 @@ def add_request(request: Any) -> TemplateResponse:
                                         token=request.POST['token'],
                                         version_control=request.POST['version_control'],
                                         branch=request.POST['branch'],
+                                        port=request.POST['port'],
                                         profile=Profile.objects.get(email=request.POST['email']))
                 
                 # save user request
@@ -298,6 +302,37 @@ def get_all_web_elements(soup: BeautifulSoup) -> list:
     #         temp.append(x)
             
     # return temp
+    
+def download_files(ftp, path, destination):
+
+    path = path[:-1] if path[-1] == '/' else path
+
+    try:
+        folder = path[path.rfind('/')+1:]
+        destination = os.path.join(destination, folder)
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+            
+        print(f"path: {destination}")
+        
+    except ftplib.error_perm:
+        
+        print("error: could not change to "+path)
+        
+    for file in ftp.nlst():
+        try:
+            #this will check if file is folder:
+            new_dest = f'{path}/{file}'
+            ftp.cwd(file)
+            #if so, explore it:
+            download_files(ftp, new_dest, destination)
+            ftp.cwd('..')
+        except ftplib.error_perm:
+            if file.endswith('.html') or file.endswith('.png') or file.endswith('.jpg') or file.endswith('.jpeg'):
+                with open(os.path.join(destination,file),"wb") as f:
+                    ftp.retrbinary("RETR "+file, f.write)
+            
+    return
 
 def change_request(request: Any) -> TemplateResponse:
     """
@@ -321,8 +356,14 @@ def change_request(request: Any) -> TemplateResponse:
             token = client_request.token
             version_control = client_request.version_control
             branch = client_request.branch
+            port = client_request.port
             profile = client_request.profile
             
+            # if version control is FTP
+            Repo_Name = os.path.join(REPO_DIR, branch[branch.rfind('/')+1:]) \
+                            if version_control.lower() == 'ftp' \
+                            else os.path.join(REPO_DIR, code_link[code_link.rfind('/')+1:].split('.')[0])
+
             # if user pressed 'Edit Request' btn render add_request.html
             if 'edit_request' in request.POST:
                 return TemplateResponse(request, 
@@ -334,6 +375,7 @@ def change_request(request: Any) -> TemplateResponse:
                                          'token': token,
                                          'version_control': version_control,
                                          'branch': branch,
+                                         'port': port,
                                          'profile': profile,
                                          'edit_request': 'edit_request'
                                          })
@@ -360,14 +402,23 @@ def change_request(request: Any) -> TemplateResponse:
                 Response_Image_Table = []
                 Response_Image_Table_Length = len(Response_Image_Table)
                 
-                # Create url to get repository
-                Repo_Path = f"{code_link[:code_link.find('//')+2]}{username}:{token}@{code_link[code_link.find('//')+2:]}"
-                
-                # Set branch
-                Branch_Name = branch
-                
-                # Extract Repo Name from url
-                Repo_Name = os.path.join(REPO_DIR, Repo_Path[Repo_Path.rfind('/')+1:].split('.')[0])
+                # if version_control.lower() == 'ftp':
+                #     Repo_Path = code_link.replace('//',f'//{username}:{token}@')
+                #     # Set branch
+                #     Branch_Name = branch
+                    
+                #     # Extract Repo Name from url
+                #     Repo_Name = os.path.join(REPO_DIR, Repo_Path[Repo_Path.rfind('/')+1:].split('.')[0])
+                    
+                # else:
+                #     # Create url to get repository
+                #     # Repo_Path = f"{code_link[:code_link.find('//')+2]}{username}:{token}@{code_link[code_link.find('//')+2:]}"
+                #     Repo_Path = code_link.replace('//',f'//{username}:{token}@')
+                #     # Set branch
+                #     Branch_Name = branch
+                    
+                #     # Extract Repo Name from url
+                #     Repo_Name = os.path.join(REPO_DIR, Repo_Path[Repo_Path.rfind('/')+1:].split('.')[0])
                 
                 
                 Html_List = []
@@ -383,28 +434,56 @@ def change_request(request: Any) -> TemplateResponse:
                 # if 'Repo_Path' in request.POST and 'Branch_Name' in request.POST and 'Page_Name' not in request.POST and 'save' not in request.POST and 'push' not in request.POST:
                 if 'make_changes' in request.POST:
                     
-                    # Auto pull remote repository and change branch
-                    if not(os.path.exists(REPO_DIR)):
-                        os.makedirs(REPO_DIR)
-
-                    if not(os.path.exists(Repo_Name)):
-                        repo = git.Repo.clone_from(Repo_Path, Repo_Name)
+                    if version_control.lower() == 'ftp':
+                        
+                        if os.path.exists(Repo_Name):
+                            # os.rmdir(Repo_Name)
+                            shutil.rmtree(Repo_Name)
+                            
+                        # create FTP instance 
+                        ftp = ftplib.FTP()
+                        
+                        # connect to ftp server
+                        ftp.connect(host=code_link, port=int(port))
+                        
+                        # Login to server
+                        ftp.login(username, token)
+                        
+                        # change to location to source
+                        ftp.cwd(branch)
+                        
+                        # download all files to REPO_DIR (All_Repo)
+                        download_files(ftp, branch, REPO_DIR)
+                        
+                        ftp.quit()
                         
                     else:
-                        repo = git.Repo(Repo_Name)
-                        repo.git.reset("--hard")
                         
-                    repo.git.checkout(Branch_Name)
-                    repo.git.pull()
+                        Repo_Path = code_link.replace('//',f'//{username}:{token}@')
+                        
+                        # Auto pull remote repository and change branch
+                        if not(os.path.exists(REPO_DIR)):
+                            os.makedirs(REPO_DIR)
+
+                        if not(os.path.exists(Repo_Name)):
+                            repo = git.Repo.clone_from(Repo_Path, Repo_Name)
+                            
+                        else:
+                            repo = git.Repo(Repo_Name)
+                            repo.git.reset("--hard")
+                            
+                        repo.git.checkout(branch)
+                        repo.git.pull()
                     
-                    if len(Html_List) == 0 or len(img_list) == 0:
-                        for root, dirnames, filenames in os.walk(Repo_Name):
-                            for filename in filenames:
-                                if filename.endswith('.html'):
-                                    Html_List.append(os.path.join(root, filename))
-                                    
-                                elif filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg'):
-                                    img_list.append(os.path.join(root, filename))
+                    Html_List = []
+                    img_list = []
+                    for root, dirnames, filenames in os.walk(Repo_Name):
+                        for filename in filenames:
+                            if filename.endswith('.html'):
+                                Html_List.append([filename, os.path.join(root, filename)])
+                                
+                            elif filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg'):
+                                img_list.append(os.path.join(root, filename))
                 
                 elif 'Page_Name' in request.POST and 'save' not in request.POST and 'push' not in request.POST:
                     
