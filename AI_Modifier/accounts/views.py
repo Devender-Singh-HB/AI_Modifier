@@ -138,9 +138,9 @@ def add_request(request: Any) -> TemplateResponse:
                     code_link=request.POST['link'],
                     username=request.POST['username'],
                     token=request.POST['token'],
-                    version_control=request.POST['version_control'],
+                    version_control=str(request.POST['version_control']).lower(),
                     branch=request.POST['branch'],
-                    port=request.POST['port'],
+                    port=request.POST['port'] if 'post' in request.POST else 0,
                     profile=Profile.objects.get(email=request.POST['email'])
                 )
                 
@@ -152,7 +152,7 @@ def add_request(request: Any) -> TemplateResponse:
                                         code_link=request.POST['link'],
                                         username=request.POST['username'],
                                         token=request.POST['token'],
-                                        version_control=request.POST['version_control'],
+                                        version_control=str(request.POST['version_control']).lower(),
                                         branch=request.POST['branch'],
                                         port=request.POST['port'],
                                         profile=Profile.objects.get(email=request.POST['email']))
@@ -230,6 +230,13 @@ def get_all_images(soup: BeautifulSoup, img_list: list) -> list:
                                            {'src': img_list_element[len(REPO_DIR)-8:], 
                                             'available_images': get_images(img_list_element[:img_list_element.rfind('/')], len(img_list_element.split('/')))}, 
                                            idx])
+                    
+            if img['src'].startswith('http') and (img['src'].endswith('.png') or img['src'].endswith('.jpg') or img['src'].endswith('.jpeg')):
+                response_table.append([img['src'].split('/')[-1].split('.')[0], 
+                                        {'src': img['src'], 
+                                        # 'available_images': get_images(img_list_element[:img_list_element.rfind('/')], len(img_list_element.split('/')))
+                                        }, 
+                                        idx])
                     
         except Exception as e: 
             print(e)

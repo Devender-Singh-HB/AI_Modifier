@@ -40,6 +40,14 @@ p {
   color: #fff;
 }
 
+/* th {
+  font-size: x-large;
+}
+
+td {
+  font-size: x-large;
+} */
+
 button {
   height: 55px;
   line-height: 55px;
@@ -145,6 +153,7 @@ margin: 0;
 padding: 0;
 font-family: 'Merriweather', serif;
 }
+
 .header{
 min-height: 100vh;
 width: 100%;
@@ -153,6 +162,7 @@ background-position: center;
 background-size: cover;
 position: relative;
 }
+
 .hero-btn{
 display: inline-block;
 text-decoration: none;
@@ -164,11 +174,13 @@ background: transparent;
 position: relative;
 cursor: pointer;
 }
+
 .hero-btn:hover{
 border: 1px solid #4a7ff3;
 background: #4a7ff3;
 transition: 0.2s;
 }
+
 .hero-btn:disabled,hero-btn[disabled]{
 display: inline-block;
 text-decoration: none;
@@ -180,6 +192,7 @@ background: transparent;
 position: relative;
 cursor: pointer;
 }
+
 .text-manage{
 top: 120px;
 right: 20px;
@@ -192,6 +205,7 @@ color: #fff;
 font-size: 18px;
 overflow: hidden;
 }
+
 .input-field{
 width: 100%;
 padding:5px 5px;
@@ -204,6 +218,7 @@ outline:none;
 color: #fff;
 background: transparent;
 }
+
 .input-field1{
 display: inline-block;
 width: 100%;
@@ -218,6 +233,7 @@ outline:none;
 color: #fff;
 background: transparent;
 }
+
 .input-field2{
 width: 60px;
 margin:5px 5px;
@@ -225,6 +241,7 @@ padding-left: 3px;
 color: #fff;
 background: transparent;
 }
+
 .input-field3{
 display: inline-block;
 width: 70px;
@@ -232,16 +249,20 @@ color: #fff;
 background: transparent;
 box-sizing: border-box;
 }
+
 .mx-2 {
 margin-right: .5rem !important;
 margin-left: -1.0rem !important;
 }
+
 .dropdown{
 color: #fff;
 }
+
 option.dropdown{
 color: #000;
 }
+
 .table-responsive{
 top: 70px;
 left: 35px;
@@ -252,32 +273,39 @@ margin:1% auto;
 background: rgba(0,0,0,0.3);
 padding:20px;
 }
+
 .table {
 counter-set: 0;
 counter-reset: set;
 }
+
 .table tr td:first-child:before{
 counter-increment: set;
 counter-set: 1;
 content: counter(set);
 }
+
 .text-center{
 font-size: 32px;
 color: #fff;
 }
+
 .table-responsive caption{
 font-size: 20px;
 color: #fff;
 }
+
 .msg{
 font-size: 20px;
 color: rgb(72, 255, 0);
 }
+
 .button-wapper{
 display: flex;
 gap: 15px;
 margin-top: 15px;
 }
+
 .button-wapper button{
 line-height: 34px;
 padding:0 !important;
@@ -285,41 +313,88 @@ height:40px;
 margin:0 !important;
 border-radius: 5px !important;
 }
+
 .header_btn{
 display: flex;
 justify-content: space-between;
 }
+
 .cx-2 {
 margin-right: .5rem !important;
 margin-left: -1.0rem !important;
 }
+
+.c-table {
+  font-size:medium;
+}
+
 .c-input-field2{
-width: 60px;
+/* width: 60px; */
+font-size: x-large;
 margin:5px 5px;
 padding-left: 3px;
+text-align: center;
 color: rgb(0, 0, 0);
 background: transparent;
+border: 1px solid rgb(0 0 0 / 100%);
 }
+
+.c-select {
+  text-align: center;
+}
+
 .c-input-field3{
 display: inline-block;
-width: 75px;
+/* width: 75px; */
 color: #fff;
 background: transparent;
 box-sizing: border-box;
 }
+
+.c-input-field4{
+  /* margin: 5px 15px; */
+  padding-left: 3px;
+  color: rgb(0, 0, 0);
+  background: white;
+}
+
+.c-checkbox-field4 {
+  width: 20px;
+  justify-content: center;
+  margin:5px 5px;
+  padding-left: 3px;
+  color: rgb(0, 0, 0);
+  background: transparent;
+}
+
 .c-border {
   border: 1px solid rgb(0, 0, 0);
 }
+
 .c-form {
   display: flex; 
   align-items: center;
+  justify-content: center;
+  padding: 10px;
 }
+
+.c-form-checkbox {
+  display: flex; 
+  align-items: center;
+}
+
 .c-label {
   color: #000;
 }
+
+.c-label-checkbox {
+  color: #fff;
+}
+
 .c-btn {
   align-items: center;
 }
+
 .client_req_form {
   max-width: 80%;
   text-align: center;

@@ -69,7 +69,7 @@
       {% if Text_Table_Length != 0 %}
         <div class="table-responsive text-align-center">
           <h2 class="text-center">Replace place</h2>
-          <table class="table table-success table-striped table-hover">
+          <table class="table table-success table-striped table-hover c-table">
             <caption class="text-align-center">List of found text</caption>
             <thead>
               <tr>
@@ -95,22 +95,28 @@
                       {% endif %}
                       <input type="hidden" name="index", value={{ x.5 }} >
                       <input type="hidden" name="color_change" id="color_change_{{x.5}}" value="false" required>
-                      <div class="text-flex">
-                        <!-- <span><strong>Text:</strong></span> -->
+                      <!-- <div class="text-flex">
+                        <span><strong>Text:</strong></span>
                         {% if x.4|length > 0 %}
                           <label style="color: {{x.4}}; font-size: {{x.3}}px;">{{x.1}}</label>
                         {% else %}
                           <label style="color: black; font-size: {{x.3}}px;">{{x.1}}</label>
                         {% endif %}
+                      </div> -->
+                      <div class="c-form">
+                        <label class="c-label">Text: </label>
+                        <input name="Replace_Text_With" value="{{x.1}}" style="color:black;" type="text" class="c-input-field2">
                       </div>
-                      <input name="Replace_Text_With" value="{{x.1}}" style="color:black;" type="text" class="input-field text-align-center">
 
                       <div class="c-form">
-                        <label class="c-label">Font Size: </label><input name="Replace_Font_With" value="{{x.3}}" type="number" min="1" style="color:black;" class="c-input-field2 c-border"></input>
-                        <label class="c-label">Font Color: </label><input name="Replace_Color_With" id="color_{{x.5}}" value="{{x.4}}" type="color" class="c-input-field3 cx-2" onchange="color_changer(this)"></input>
+                        <label class="c-label">Size: </label><input name="Replace_Font_With" value="{{x.3}}" type="number" min="1" style="color:black;" class="c-input-field2 "></input>
                         <br><br>
-                        <button type="submit" class="btn btn-primary btn-sm">Change This</button>
                       </div>
+                      <div class="c-form">
+                        <label class="c-label">Color: </label><input name="Replace_Color_With" id="color_{{x.5}}" value="{{x.4}}" type="color" class="c-input-field3 cx-2" onchange="color_changer(this)"></input>
+                        <br><br>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Change This</button>
                     </form>
                   </td>
                 </tr>
@@ -137,8 +143,12 @@
               {% for x in Image_Table %}
                 <tr>
                   <td></td>
-                  <td>{{x.0}}</td>
-                  <td><img src="{% static x.1.src %}" width="80px" height="80px"></td>
+                  <td style="word-break: break-word;">{{x.0}}</td>
+                  {% if x.1.available_images %}
+                    <td><img src="{% static x.1.src %}" width="80px" height="80px"></td>
+                  {% else %}
+                    <td><img src="{{x.1.src}}" width="80px" height="80px"></td>
+                  {% endif %}
                   <td>{{x.2|add:'1'}} </td>
 
                   <td>
@@ -157,7 +167,7 @@
                         <input type="hidden" name="index", value="{{ x.2 }}" >
                         
                         {% if x.1.available_images %}
-                        <select id="available_images" name="available_images" class="input-field1" onchange="check_upload(this)" style="color:#000000;">
+                        <select id="available_images_{{x.2}}" name="available_images" class="input-field1 c-select" onchange="check_upload(this)" style="color:#000000;">
                           <option class="dropdown" value="select_availaible_image" selected>Select Available Image</option>
                           {% for x in x.1.available_images %}
                           <option class="dropdown" value="{{x.1}}">{{x.0}}</option>
@@ -165,14 +175,14 @@
                         </select>
                         {% endif %}
                         <br><br>
-                        <input type="file" id="myFile" name="filename">
+                        <input type="file" id="myFile_{{x.2}}" name="filename">
                         <div class="c-form">
-                          <label for="width">Width:</label><input id="width" name="width" class="c-input-field2 c-border">
-                          <label for="height">Height:</label><input id="height" name="height" class="c-input-field2 c-border">
+                          <label for="width" class="c-label">Width:</label><input id="width" name="width" class="c-input-field2 c-border">
+                          <label for="height" class="c-label">Height:</label><input id="height" name="height" class="c-input-field2 c-border">
                           <br><br>
                           <!-- <input type="submit" class="btn btn-primary btn-sm">Change This</input> -->
                         </div>
-                        <button type="submit" class="btn btn-primary btn-sm">Change This</button>
+                        <button type="submit" class="btn btn-primary">Change This</button>
                       </form>
                     </div>
                   </td>
@@ -204,7 +214,7 @@
       var SaveButton = document.getElementById('save');
       var PushButton = document.getElementById('push');
       var available_images = document.getElementById('available_images');
-      var upload_file = document.getElementById('myFile')
+      
       var msg = "{{msg}}";
       var save_btn = "{{save_btn}}";
 
@@ -235,8 +245,18 @@
 
 
 
-      function check_upload(selectObject) {
-        var value = selectObject.value;  
+      function check_upload(object) {
+
+        const object_id_arr = object.id.split('_');
+        
+        var ch = object_id_arr[object_id_arr.length-1];
+
+        var element_id = 'myFile' + '_' + ch;
+        
+        var upload_file = document.getElementById(element_id)
+
+        var value = object.value;  
+        
         if (value != "select_availaible_image") {
           upload_file.disabled = true;
         } else {

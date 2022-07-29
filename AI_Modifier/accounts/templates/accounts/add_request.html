@@ -21,69 +21,91 @@
             <br><br>
 
             <form action="{% url 'add_request' %}" method="post" class="client_change_req_form">
+                <div class="c-form-checkbox">
+                    <label for="ftp_checkbox" class="c-label-checkbox">FTP</label>
+                    {% if version_control|length > 0 and version_control|lower == "ftp" %}
+                        <input type="checkbox" id="ftp_checkbox" name="ftp_checkbox" class="c-checkbox-field4" checked="true" onclick="form_changer(this);">
+                    {% else %}
+                        <input type="checkbox" id="ftp_checkbox" name="ftp_checkbox" class="c-checkbox-field4" onclick="form_changer(this);">
+                    {% endif %}
+                </div>
                 {% csrf_token %}
-                <label for="url">URL</label>
-                <br>
-                {% if url %}
-                <input type="url" name="url-show" id="url-show" value={{url}} disabled="true" required>
-                <input type="hidden" name="url" id="url" value={{url}} required>
-                {% else %}
-                <input type="url" name="url" id="url" placeholder="https://www.website.com" required>
-                {% endif %}
+                <div >
+                    <label id="form_url_label" for="url" >Url</label>
+                    <br>
+                    {% if url %}
+                        <input type="url" name="url-show" id="url-show" class="c-input-field4" value={{url}} disabled="true" required>
+                        <input type="hidden" name="url" id="url" value={{url}} required>
+                    {% else %}
+                        <input type="url" name="url" id="url" class="c-input-field4" placeholder="https://www.website.com" required>
+                    {% endif %}
+                </div>
                 <br><br>
-        
-                <label for="link">Code link</label>
-                <br>
-                {% if code_link %}
-                <input type="text" name="link" id="link" value={{code_link}} required>
-                {% else %}
-                <input type="text" name="link" id="link" required>
-                {% endif %}
-                <br><br>
-
-                <label for="username">Username</label>
-                <br>
-                {% if username %}
-                <input type="text" name="username" id="username" value={{username}} required>
-                {% else %}
-                <input type="text" name="username" id="username" required>
-                {% endif %}
+                
+                <div >
+                    <label id="form_code_link_label" for="link">Code link</label>
+                    <br>
+                    {% if code_link %}
+                    <input type="text" name="link" id="link" class="c-input-field4" value={{code_link}} required>
+                    {% else %}
+                    <input type="text" name="link" id="link" class="c-input-field4" required>
+                    {% endif %}
+                </div>
                 <br><br>
 
-                <label for="token">Access Token</label>
-                <br>
-                {% if token %}
-                <input type="text" name="token" id="token" value={{token}} required>
-                {% else %}
-                <input type="text" name="token" id="token" required>
-                {% endif %}
+                <div >
+                    <label id="form_username_label" for="username">Username</label>
+                    <br>
+                    {% if username %}
+                    <input type="text" name="username" id="username" class="c-input-field4" value={{username}} required>
+                    {% else %}
+                    <input type="text" name="username" id="username" class="c-input-field4" required>
+                    {% endif %}
+                </div>
                 <br><br>
 
-                <label for="version_control">Version Control</label>
-                <br>
-                {% if version_control %}
-                <input type="text" name="version_control" id="version_control" value={{version_control}} required>
-                {% else %}
-                <input type="text" name="version_control" id="version_control" required>
-                {% endif %}
+                <div >
+                    <label id="form_password_label" for="token">Access Token</label>
+                    <br>
+                    {% if token %}
+                    <input type="text" name="token" id="token" class="c-input-field4" value={{token}} required>
+                    {% else %}
+                    <input type="text" name="token" id="token" class="c-input-field4" required>
+                    {% endif %}
+                </div>
                 <br><br>
 
-                <label for="branch">Branch</label>
-                <br>
-                {% if branch %}
-                <input type="text" name="branch" id="branch" value={{branch}} required>
-                {% else %}
-                <input type="text" name="branch" id="branch" required>
-                {% endif %}
+                <div >
+                    <label id="form_version_control_label" for="version_control">Version Control</label>
+                    <br>
+                    {% if version_control %}
+                    <input type="text" name="version_control" id="version_control" class="c-input-field4" value={{version_control}} required>
+                    {% else %}
+                    <input type="text" name="version_control" id="version_control" class="c-input-field4" required>
+                    {% endif %}
+                </div> 
                 <br><br>
 
-                <label for="port">Port</label>
-                <br>
-                {% if port >= 0 %}
-                <input type="text" name="port" id="port" value={{port}} required>
-                {% else %}
-                <input type="text" name="port" id="port" required>
-                {% endif %}
+                <div >
+                    <label id="form_branch_label" for="branch">Branch</label>
+                    <br>
+                    {% if branch %}
+                    <input type="text" name="branch" id="branch" class="c-input-field4" value={{branch}} required>
+                    {% else %}
+                    <input type="text" name="branch" id="branch" class="c-input-field4" required>
+                    {% endif %}
+                </div>
+                <br><br>
+                
+                <div id="port_section">
+                    <label id="form_port_label" for="port">Port</label>
+                    <br>
+                    {% if port >= 0 %}
+                    <input type="text" name="port" id="port" class="c-input-field4" value={{port}} required>
+                    {% else %}
+                    <input type="text" name="port" id="port" class="c-input-field4" value=0 required>
+                    {% endif %}
+                </div>
                 <br><br>
 
                 <input type="hidden" name="email" id="email" value={{user.email}} required>
@@ -101,6 +123,37 @@
             <button type="submit" class="login-btn" ><a href="{% url 'login' %}"> Log in </a></button>
 
         {% endif %}
+
+        <script>
+
+            var code_link_label = document.getElementById('form_code_link_label');
+            var password_label = document.getElementById('form_password_label');
+            var branch_label = document.getElementById('form_branch_label');
+            var port_div = document.getElementById('port_section');
+
+            var version_control = "{{version_control}}";
+
+            if(version_control.length == 0) {
+                port_div.style.display = "none";
+            }
+
+
+            function form_changer(ftpCheckbox) {
+                
+                if (ftpCheckbox.checked) {
+                    code_link_label.innerHTML = "Server";
+                    password_label.innerHTML = "Password";
+                    branch_label.innerHTML = "Location";
+                    port_div.style.display = "initial";
+                } 
+                else {
+                    code_link_label.innerHTML = "Code Link";
+                    password_label.innerHTML = "Access Token";
+                    branch_label.innerHTML = "Branch";
+                    port_div.style.display = "none";
+                }
+            }
+        </script>
         
     </div>
 
