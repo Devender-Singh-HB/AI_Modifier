@@ -162,6 +162,7 @@ notes.txt
 .env
 /venv
 .vscode
-/All_Repo
-/AI_Modifier/All_Repo
-/AI_Modifier/accounts/static/All_Repo
+All_Repo/
+AI_Modifier/All_Repo
+AI_Modifier/accounts/static/All_Repo
+AI_Modifier/static/All_Repo/
