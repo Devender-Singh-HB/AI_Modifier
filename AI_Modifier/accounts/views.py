@@ -138,9 +138,9 @@ def add_request(request: Any) -> TemplateResponse:
                     code_link=request.POST['link'],
                     username=request.POST['username'],
                     token=request.POST['token'],
-                    version_control=str(request.POST['version_control']).lower(),
+                    version_control=request.POST['version_control'],
                     branch=request.POST['branch'],
-                    port=request.POST['port'] if 'post' in request.POST else 0,
+                    port=request.POST['port'],
                     profile=Profile.objects.get(email=request.POST['email'])
                 )
                 
@@ -152,7 +152,7 @@ def add_request(request: Any) -> TemplateResponse:
                                         code_link=request.POST['link'],
                                         username=request.POST['username'],
                                         token=request.POST['token'],
-                                        version_control=str(request.POST['version_control']).lower(),
+                                        version_control=request.POST['version_control'],
                                         branch=request.POST['branch'],
                                         port=request.POST['port'],
                                         profile=Profile.objects.get(email=request.POST['email']))
@@ -230,13 +230,6 @@ def get_all_images(soup: BeautifulSoup, img_list: list) -> list:
                                            {'src': img_list_element[len(REPO_DIR)-8:], 
                                             'available_images': get_images(img_list_element[:img_list_element.rfind('/')], len(img_list_element.split('/')))}, 
                                            idx])
-                    
-            if img['src'].startswith('http') and (img['src'].endswith('.png') or img['src'].endswith('.jpg') or img['src'].endswith('.jpeg')):
-                response_table.append([img['src'].split('/')[-1].split('.')[0], 
-                                        {'src': img['src'], 
-                                        # 'available_images': get_images(img_list_element[:img_list_element.rfind('/')], len(img_list_element.split('/')))
-                                        }, 
-                                        idx])
                     
         except Exception as e: 
             print(e)
@@ -323,7 +316,6 @@ def download_files(ftp, path, destination):
         print(f"path: {destination}")
         
     except ftplib.error_perm:
-        
         print("error: could not change to "+path)
         
     for file in ftp.nlst():
@@ -388,7 +380,6 @@ def change_request(request: Any) -> TemplateResponse:
                                          })
                 
             else:
-                
                 # Initialize 
                 msg = ""
                 save_btn = "save"
@@ -397,7 +388,7 @@ def change_request(request: Any) -> TemplateResponse:
                 # check is 'Path_To_Search' in form
                 if 'Path_To_Search' in request.POST:                    
                     # get 'Path_To_Search' value 
-                    Path_To_Search = request.POST['Path_To_Search']
+                    Path_To_Search = os.path.join(REPO_DIR, request.POST['Path_To_Search'])
                 else:
                     Path_To_Search = None
                 
@@ -433,10 +424,20 @@ def change_request(request: Any) -> TemplateResponse:
                 for root, dirnames, filenames in os.walk(Repo_Name):
                     for filename in filenames:
                         if filename.endswith('.html'):
-                            Html_List.append([filename, os.path.join(root, filename)])
+                            # Html_List.append([filename, os.path.join(root, filename)])
+                            
+                            file_path = os.path.join(root, filename)
+                            if file_path:
+                                print(f'File Path: {file_path[len(REPO_DIR)+1:]}')
+                                Html_List.append([filename, file_path[len(REPO_DIR)+1:]])
                             
                         elif filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg'):
-                            img_list.append(os.path.join(root, filename))
+                            # img_list.append(os.path.join(root, filename))
+                            
+                            file_path = os.path.join(root, filename)
+                            if file_path:
+                                print(f'File Path: {file_path[len(REPO_DIR)+1:]}')
+                                img_list.append(file_path[len(REPO_DIR)+1:])
                 
                 # if 'Repo_Path' in request.POST and 'Branch_Name' in request.POST and 'Page_Name' not in request.POST and 'save' not in request.POST and 'push' not in request.POST:
                 if 'make_changes' in request.POST:
@@ -487,15 +488,25 @@ def change_request(request: Any) -> TemplateResponse:
                     for root, dirnames, filenames in os.walk(Repo_Name):
                         for filename in filenames:
                             if filename.endswith('.html'):
-                                Html_List.append([filename, os.path.join(root, filename)])
+                                # Html_List.append([filename, os.path.join(root, filename)])
+                                
+                                file_path = os.path.join(root, filename)
+                                if file_path:
+                                    print(f'File Path: {file_path[len(REPO_DIR)+1:]}')                        
+                                    Html_List.append([filename, file_path[len(REPO_DIR)+1:]])
                                 
                             elif filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg'):
-                                img_list.append(os.path.join(root, filename))
+                                # img_list.append(os.path.join(root, filename))
+                                
+                                file_path = os.path.join(root, filename)
+                                if file_path:
+                                    print(f'File Path: {file_path[len(REPO_DIR)+1:]}')
+                                    img_list.append(file_path[len(REPO_DIR)+1:])
                 
                 elif 'Page_Name' in request.POST and 'save' not in request.POST and 'push' not in request.POST:
                     
                     # Pull all the Editable content from the HTML page
-                    Path_To_Search = request.POST['Page_Name']
+                    Path_To_Search = os.path.join(REPO_DIR, request.POST['Page_Name'])
                     
                     if 'find' in request.POST:
                         with open(Path_To_Search) as fp:
@@ -768,7 +779,7 @@ def change_request(request: Any) -> TemplateResponse:
                                          'msg':msg, 
                                          'save_btn':save_btn, 
                                          'client_req_urls':request.POST['client_req_urls'],
-                                         'Path_To_Search': Path_To_Search},
+                                         'Path_To_Search': Path_To_Search[len(REPO_DIR)+1:] if Path_To_Search is not None else Path_To_Search},
                                         )
         
         except Exception as e:
