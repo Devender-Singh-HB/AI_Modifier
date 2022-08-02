@@ -51,24 +51,5 @@ def send_mail(sender, instance, created, **kwargs):
     if created:
         instance.auto_generated = True
         instance.save()
-    #     dotenv.read_dotenv() # reading SENDGRID_API_KEY
-    #     message = Mail(
-    #         from_email='devender.singh@hestabit.in',
-    #         to_emails=instance.email,
-    #         subject=f'Welcome {instance.first_name}',
-    #         html_content=f'Hello,<br>Your password is <strong>{password}</strong>.\
-    #                         <br><br>This is a system generated email.')
-
-    #     try:
-    #         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    #         response = sg.send(message)
-    #         print(response.status_code)
-    #         print(response.body)
-    #         print(response.headers)
-
-    #     except Exception as e:
-    #         print(e)
-    #         print(e.body)
         
-    # else:
-    #     print('user not created')
+        # Send Email to user

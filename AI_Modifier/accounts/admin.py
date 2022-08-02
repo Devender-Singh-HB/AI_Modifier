@@ -96,8 +96,8 @@ def push_repository(modeladmin, request, queryset):
                     repo = git.Repo(query.repo)
                     repo.git.add(all=True)
                     commit_message = f"AI_MODIFIER_{uuid.uuid4().hex}"
-                    # repo.index.commit(commit_message)
-                    repo.commit(commit_message)
+                    repo.index.commit(commit_message)
+                    # repo.commit(commit_message)
                     origin = repo.remote(name='origin')
                     origin.push()
                     
