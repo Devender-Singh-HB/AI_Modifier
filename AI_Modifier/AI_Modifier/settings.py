@@ -33,7 +33,7 @@ if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # During development only
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Application definition
 
@@ -153,6 +153,7 @@ AUTH_USER_MODEL = 'modifier_admin.Profile'
 # EMAIL SETTINGS
 SENDGRID_API_KEY = config('SENDGRID_API_KEY')
 
+DEFAULT_FROM_EMAIL = config('EMAIL_ID')
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
 EMAIL_HOST_PASSWORD = SENDGRID_API_KEY

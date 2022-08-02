@@ -170,7 +170,7 @@
                         <select id="available_images_{{x.2}}" name="available_images" class="input-field1 c-select" onchange="check_upload(this)" style="color:#000000;">
                           <option class="dropdown" value="select_availaible_image" selected>Select Available Image</option>
                           {% for x in x.1.available_images %}
-                          <option class="dropdown" value="{{x.1}}">{{x.0}}</option>
+                          <option class="dropdown" value="{{x}}">{{x}}</option>
                           {% endfor %}
                         </select>
                         {% endif %}

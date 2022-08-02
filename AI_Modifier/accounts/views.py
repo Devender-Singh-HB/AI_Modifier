@@ -194,7 +194,8 @@ def get_images(dir: str, dir_level:int) -> list:
             if file_level == dir_level and (filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg')):
                 
                 # add image's path to the result
-                res.append([filename, os.path.join(root, filename)])
+                # res.append([filename, os.path.join(root, filename)])
+                res.append(filename)
     
     # return result       
     return res
@@ -226,9 +227,10 @@ def get_all_images(soup: BeautifulSoup, img_list: list) -> list:
                     
                     # found image location and adding 'tag', 'current image source',
                     # 'all other images in that directory' and 'index of img' soup element.
+                    file_path = os.path.join(REPO_DIR, img_list_element)
                     response_table.append([img_list_element.split('/')[-1].split('.')[0], 
-                                           {'src': img_list_element[len(REPO_DIR)-8:], 
-                                            'available_images': get_images(img_list_element[:img_list_element.rfind('/')], len(img_list_element.split('/')))}, 
+                                           {'src': os.path.join('All_Repo', img_list_element), 
+                                            'available_images': get_images(file_path[:file_path.rfind('/')], len(file_path.split('/')))}, 
                                            idx])
                     
         except Exception as e: 
@@ -660,7 +662,7 @@ def change_request(request: Any) -> TemplateResponse:
                                     image.save(image_location)
                                     
                                     # append newly created image to image_list
-                                    img_list.append(image_location)
+                                    img_list.append(image_location[len(REPO_DIR)+1:])
                                 except:
                                     pass
 
