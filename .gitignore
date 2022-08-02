@@ -127,6 +127,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+AI_Modifier/static/All_Repo/
 
 # Spyder project settings
 .spyderproject
