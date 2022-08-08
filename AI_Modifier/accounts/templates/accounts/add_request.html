@@ -43,7 +43,11 @@
                 <br><br>
                 
                 <div >
-                    <label id="form_code_link_label" for="link">Code link</label>
+                    {% if version_control|length > 0 and version_control|lower == "ftp" %}
+                        <label id="form_code_link_label" for="link">Server</label>
+                    {% else %}
+                        <label id="form_code_link_label" for="link">Code Link</label>
+                    {% endif %}
                     <br>
                     {% if code_link %}
                     <input type="text" name="link" id="link" class="c-input-field4" value={{code_link}} required>
@@ -65,7 +69,11 @@
                 <br><br>
 
                 <div >
-                    <label id="form_password_label" for="token">Access Token</label>
+                    {% if version_control|length > 0 and version_control|lower == "ftp" %}
+                        <label id="form_password_label" for="token">Password</label>
+                    {% else %}
+                        <label id="form_password_label" for="token">Access Token</label>
+                    {% endif %}
                     <br>
                     {% if token %}
                     <input type="text" name="token" id="token" class="c-input-field4" value={{token}} required>
@@ -87,7 +95,11 @@
                 <br><br>
 
                 <div >
-                    <label id="form_branch_label" for="branch">Branch</label>
+                    {% if version_control|length > 0 and version_control|lower == "ftp" %}
+                        <label id="form_branch_label" for="branch">Location</label>
+                    {% else %}
+                        <label id="form_branch_label" for="branch">Branch</label>
+                    {% endif %}
                     <br>
                     {% if branch %}
                     <input type="text" name="branch" id="branch" class="c-input-field4" value={{branch}} required>
@@ -96,14 +108,17 @@
                     {% endif %}
                 </div>
                 <br><br>
-                
-                <div id="port_section">
+                {% if version_control|length > 0 and version_control|lower == "ftp" %}
+                    <div id="port_section">
+                {% else %}
+                    <div id="port_section" style="display: none;">
+                {% endif %}
                     <label id="form_port_label" for="port">Port</label>
                     <br>
                     {% if port >= 0 %}
                     <input type="text" name="port" id="port" class="c-input-field4" value={{port}} required>
                     {% else %}
-                    <input type="text" name="port" id="port" class="c-input-field4" value=0 required>
+                    <input type="text" name="port" id="port" class="c-input-field4" required>
                     {% endif %}
                 </div>
                 <br><br>

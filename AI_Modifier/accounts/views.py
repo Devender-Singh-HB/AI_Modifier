@@ -195,6 +195,7 @@ def get_images(dir: str, dir_level:int) -> list:
                 
                 # add image's path to the result
                 # res.append([filename, os.path.join(root, filename)])
+                print(f'{root}/{filename}')
                 res.append(filename)
     
     # return result       
@@ -252,6 +253,8 @@ def get_all_web_elements(soup: BeautifulSoup) -> list:
     # Initialize results
     response_Table = []
     
+    tags = ['style', 'script', 'head', 'meta', '[document]']
+    
     # get all web elements
     for idx, x in enumerate(soup.find_all(tag='', text=re.compile(''))):
         # remove ankle brackets
@@ -260,40 +263,42 @@ def get_all_web_elements(soup: BeautifulSoup) -> list:
         # split web element string at " "
         if " " in tag: tag = tag.split(" ")[0]
         
-        # get web element's string
-        soup_string = str(x.string)
+        if tag not in tags:
         
-        # if web element is dynamic i.e., have {{ some variable }}, skip it
-        if "{{" in soup_string and "}}" in soup_string: continue
-        
-        # convert string
-        text = str(x)
-        
-        # if font-size is present in web element 
-        if text.find("font-size") != -1:
+            # get web element's string
+            soup_string = str(x.string)
             
-            # extract font-size's value 
-            size = str(text.split("font-size:")[1].split("px;")[0])
+            # if web element is dynamic i.e., have {{ some variable }}, skip it
+            if "{{" in soup_string and "}}" in soup_string: continue
             
-        # else set it to ""
-        else:
-            size = ""
+            # convert string
+            text = str(x)
             
-        # if color is present in web element
-        if text.find("color") != -1:
+            # if font-size is present in web element 
+            if text.find("font-size") != -1:
+                
+                # extract font-size's value 
+                size = str(text.split("font-size:")[1].split("px;")[0])
+                
+            # else set it to ""
+            else:
+                size = ""
+                
+            # if color is present in web element
+            if text.find("color") != -1:
+                
+                # extract color's value
+                color = text.split("color:")[1].split(";")[0]
+                
+            # else set it to ""
+            else:
+                color = ""
+                
+            # create attribute list of web element
+            temp = [tag, soup_string.strip(), text ,size, color, idx]
             
-            # extract color's value
-            color = text.split("color:")[1].split(";")[0]
-            
-        # else set it to ""
-        else:
-            color = ""
-            
-        # create attribute list of web element
-        temp = [tag, soup_string.strip(), text ,size, color, idx]
-        
-        # append attribute list to Response_Table
-        response_Table.append(temp)
+            # append attribute list to Response_Table
+            response_Table.append(temp)
     
     return response_Table
         
@@ -314,11 +319,9 @@ def download_files(ftp, path, destination):
         destination = os.path.join(destination, folder)
         if not os.path.exists(destination):
             os.makedirs(destination)
-            
-        print(f"path: {destination}")
-        
+                
     except ftplib.error_perm:
-        print("error: could not change to "+path)
+        pass
         
     for file in ftp.nlst():
         try:
@@ -386,6 +389,7 @@ def change_request(request: Any) -> TemplateResponse:
                 msg = ""
                 save_btn = "save"
                 content_btn = "text"
+                tags = ['style', 'script', 'head', 'title', 'meta', '[document]']
                 
                 # check is 'Path_To_Search' in form
                 if 'Path_To_Search' in request.POST:                    
@@ -430,7 +434,7 @@ def change_request(request: Any) -> TemplateResponse:
                             
                             file_path = os.path.join(root, filename)
                             if file_path:
-                                print(f'File Path: {file_path[len(REPO_DIR)+1:]}')
+                                
                                 Html_List.append([filename, file_path[len(REPO_DIR)+1:]])
                             
                         elif filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg'):
@@ -438,7 +442,7 @@ def change_request(request: Any) -> TemplateResponse:
                             
                             file_path = os.path.join(root, filename)
                             if file_path:
-                                print(f'File Path: {file_path[len(REPO_DIR)+1:]}')
+                                
                                 img_list.append(file_path[len(REPO_DIR)+1:])
                 
                 # if 'Repo_Path' in request.POST and 'Branch_Name' in request.POST and 'Page_Name' not in request.POST and 'save' not in request.POST and 'push' not in request.POST:
@@ -494,7 +498,7 @@ def change_request(request: Any) -> TemplateResponse:
                                 
                                 file_path = os.path.join(root, filename)
                                 if file_path:
-                                    print(f'File Path: {file_path[len(REPO_DIR)+1:]}')                        
+                                                      
                                     Html_List.append([filename, file_path[len(REPO_DIR)+1:]])
                                 
                             elif filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.jpeg'):
@@ -502,7 +506,7 @@ def change_request(request: Any) -> TemplateResponse:
                                 
                                 file_path = os.path.join(root, filename)
                                 if file_path:
-                                    print(f'File Path: {file_path[len(REPO_DIR)+1:]}')
+                                    
                                     img_list.append(file_path[len(REPO_DIR)+1:])
                 
                 elif 'Page_Name' in request.POST and 'save' not in request.POST and 'push' not in request.POST:
@@ -515,9 +519,9 @@ def change_request(request: Any) -> TemplateResponse:
                             soup = BeautifulSoup(fp, 'html.parser')
                 
                             # tags = ['style', 'script', 'head', 'title', 'meta', '[document]']
-                            tags = ['style']
-                            for t in tags:
-                                [s.extract() for s in soup(t)]
+                            # tags = ['style']
+                            # for t in tags:
+                            #     [s.extract() for s in soup(t)]
                             
                             # get response table
                             Response_Table = get_all_web_elements(soup=soup)                        
@@ -546,8 +550,8 @@ def change_request(request: Any) -> TemplateResponse:
                     Replace_Color_With = request.POST['Replace_Color_With']
                     color_change = request.POST['color_change']
                     
-                    for t in ['style']:
-                        [s.extract() for s in soup(t)]
+                    # for t in tags:
+                    #     [s.extract() for s in soup(t)]
                     
                     elements = soup.find_all(tag='', text=re.compile(''))
                     element = elements[int(request.POST['index'])]
@@ -750,9 +754,9 @@ def change_request(request: Any) -> TemplateResponse:
                     
                     with open(Path_To_Search) as fp:
                         soup = BeautifulSoup(fp, 'html.parser')
-                    tags = ['style']
-                    for t in tags:
-                        [s.extract() for s in soup(t)]
+                    # tags = ['style']
+                    # for t in tags:
+                    #     [s.extract() for s in soup(t)]
                     
                     Response_Table = get_all_web_elements(soup)
                     Response_Table_Length = len(Response_Table)
@@ -788,12 +792,6 @@ def change_request(request: Any) -> TemplateResponse:
             print(f'Some exception has occured: {e}')
             
     return redirect("index")
-
-
-
-
-
-
 
 
 def password_reset_request(request):

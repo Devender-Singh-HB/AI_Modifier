@@ -9,6 +9,9 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 
 from .password import random_password, temp_password
 from .manager import CustomProfileManager
@@ -45,7 +48,7 @@ def add_password(sender, instance, *args, **kwargs):
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def send_mail(sender, instance, created, **kwargs):
+def send_mail_to_user(sender, instance, created, **kwargs):
     password = temp.get_password
     print(f'\nLogin Credentials\nEmail: {instance.email}\nPassword: {password}') # Display Credentials to console
     if created:
@@ -53,3 +56,26 @@ def send_mail(sender, instance, created, **kwargs):
         instance.save()
         
         # Send Email to user
+        context = {
+                    'user': instance,
+                    'password': password,
+                }
+        
+        subject = render_to_string('modifier_admin/subject.txt', context)
+        text_message = render_to_string('modifier_admin/user_created.txt', context)
+        html_message = render_to_string('modifier_admin/user_created.html', context)
+        
+        mail = EmailMultiAlternatives(subject=subject, from_email=settings.DEFAULT_FROM_EMAIL,
+                             to=[instance.email], body=text_message)
+        
+        mail.attach_alternative(html_message, "text/html")
+        mail.send()
+        
+        # send_mail(
+        #             subject='Welcome to AI Modifier!',
+        #             message=html_message,
+        #             html_message=html_message,
+        #             recipient_list=[instance.email],
+        #             from_email=settings.DEFAULT_FROM_EMAIL,
+        #             fail_silently=False,
+        #         )

@@ -44,7 +44,9 @@ urlpatterns = [
          name='password_change_done'),
     
     path('password_reset/',
-        auth_views.PasswordResetView.as_view(template_name='accounts/password_reset.html'),
+        auth_views.PasswordResetView.as_view(template_name='accounts/password_reset.html',
+                                             email_template_name='accounts/password_reset_email.html',
+                                             subject_template_name='accounts/password_reset_subject.txt'),
         name='password_reset'),
 
     # path('reset_password/',

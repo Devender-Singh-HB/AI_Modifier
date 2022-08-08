@@ -2,7 +2,7 @@ import random
 import string
 
 def random_password(pass_len=12):
-    symbols = list("!#$%&<>@^~")
+    symbols = list("!#$%&@^~")
     random.shuffle(symbols)
 
     lowercase = list(string.ascii_lowercase)
